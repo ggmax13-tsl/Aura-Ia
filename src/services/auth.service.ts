@@ -49,7 +49,7 @@ export class AuthService {
         // Auto login
         this.createSession(newUser);
         resolve(true);
-      }, 800);
+      }, 600);
     });
   }
 
@@ -66,7 +66,7 @@ export class AuthService {
         } else {
           resolve(false);
         }
-      }, 800);
+      }, 600);
     });
   }
 
@@ -86,7 +86,7 @@ export class AuthService {
         // Here we just session them immediately.
         this.createSession(googleUser);
         resolve(true);
-      }, 1200);
+      }, 1000);
     });
   }
 
