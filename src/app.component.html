@@ -1,0 +1,377 @@
+
+<!-- Login View -->
+@if (currentView() === 'login') {
+  <div class="min-h-screen bg-slate-50 dark:bg-[#0B0F19] flex flex-col items-center justify-center p-6 font-sans">
+    
+    <!-- Lighter Background for performance -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+       <div class="absolute top-0 left-0 w-full h-64 bg-indigo-500/10 dark:bg-indigo-900/20 blur-3xl"></div>
+    </div>
+
+    <div class="z-10 w-full max-w-xs flex flex-col items-center text-center fade-in">
+      
+      <!-- Brand Logo -->
+      <div class="mb-8">
+        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-xl shadow-indigo-500/20 flex items-center justify-center text-white mb-4 mx-auto">
+           <i class="fa fa-atom text-4xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">Aura</h1>
+        <p class="text-slate-400 text-sm">Seu assistente pessoal</p>
+      </div>
+
+      <!-- Auth Form -->
+      <div class="w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
+         
+         <div class="flex gap-2 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+            <button (click)="isRegistering.set(false)" [class]="'flex-1 py-2 text-xs font-bold rounded-lg transition-all ' + (!isRegistering() ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-400')">
+              Entrar
+            </button>
+            <button (click)="isRegistering.set(true)" [class]="'flex-1 py-2 text-xs font-bold rounded-lg transition-all ' + (isRegistering() ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-sm' : 'text-slate-400')">
+              Criar Conta
+            </button>
+         </div>
+
+         <form (submit)="submitAuth(); $event.preventDefault()" class="space-y-4">
+            @if (isRegistering()) {
+              <div class="text-left">
+                <input type="text" [(ngModel)]="loginData.name" name="name" placeholder="Seu nome" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all">
+              </div>
+            }
+            
+            <div class="text-left">
+              <input type="email" [(ngModel)]="loginData.email" name="email" placeholder="E-mail" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all">
+            </div>
+            
+            <div class="text-left">
+              <input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Senha" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all">
+            </div>
+
+            @if (loginError()) {
+              <p class="text-red-500 text-xs font-medium text-center bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{{ loginError() }}</p>
+            }
+
+            <button type="submit" [disabled]="isProcessingAuth()" class="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-70 mt-2">
+              @if (isProcessingAuth()) {
+                <i class="fa fa-circle-notch fa-spin"></i>
+              } @else {
+                {{ isRegistering() ? 'Cadastrar' : 'Entrar' }}
+              }
+            </button>
+         </form>
+
+         <!-- Google Login (Simulation) -->
+         <div class="mt-4 relative flex items-center justify-center">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100 dark:border-slate-800"></div></div>
+            <span class="relative bg-white dark:bg-slate-900 px-2 text-[10px] text-slate-400 uppercase tracking-widest">Ou</span>
+         </div>
+
+         <button (click)="loginWithGoogle()" [disabled]="isGoogleLoading()" class="w-full mt-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white font-bold py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 active:scale-95">
+            @if (isGoogleLoading()) {
+               <i class="fa fa-circle-notch fa-spin text-sm"></i>
+            } @else {
+               <i class="fab fa-google text-red-500"></i>
+               <span class="text-sm">Google</span>
+            }
+         </button>
+         
+      </div>
+
+    </div>
+  </div>
+} @else {
+
+<!-- Main App Interface -->
+<div class="min-h-screen flex flex-col bg-[#FAFAFA] dark:bg-[#0B0F19] transition-colors duration-300 font-sans pb-28">
+  
+  <!-- Compact Header -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all">
+    <div class="mx-auto max-w-lg px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-2" (click)="navigate('home')">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <i class="fa fa-atom text-sm"></i>
+          </div>
+          <span class="font-bold text-lg text-slate-800 dark:text-white tracking-tight">Aura</span>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button (click)="toggleTheme()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+            <i [class]="darkMode() ? 'fa fa-sun text-xs' : 'fa fa-moon text-xs'"></i>
+          </button>
+          <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700" (click)="navigate('profile')">
+             <img [src]="currentUser()?.avatar" class="w-full h-full object-cover">
+          </div>
+        </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 container mx-auto px-4 max-w-lg py-6">
+
+    <!-- VIEW: HOME -->
+    @if (currentView() === 'home') {
+      <div class="fade-in space-y-6">
+        
+        <!-- Compact Welcome -->
+        <div class="bg-indigo-600 dark:bg-indigo-900 rounded-2xl p-5 text-white shadow-lg shadow-indigo-500/20 flex flex-col gap-4">
+           <div>
+             <h2 class="text-xl font-bold leading-tight">Olá, {{ currentUser()?.name?.split(' ')?.[0] }}!</h2>
+             <p class="text-indigo-100 text-sm opacity-80">O que você precisa hoje?</p>
+           </div>
+           <div (click)="navigate('explore')" class="bg-white/10 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-white/20 transition">
+             <i class="fa fa-search opacity-70 text-sm"></i>
+             <span class="text-white/70 text-xs font-medium">{{ tService.t('search_placeholder') }}</span>
+           </div>
+        </div>
+
+        <!-- Compact Favorites -->
+        <section>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pl-1">Acesso Rápido</h3>
+          <div class="grid grid-cols-4 gap-3">
+            @for (fav of favorites().slice(0, 7); track fav.id) {
+              <div (click)="openTool(fav)" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition-transform">
+                <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-center text-indigo-500 dark:text-indigo-400">
+                  <i [class]="'fa ' + fav.icon + ' text-lg'"></i>
+                </div>
+                <span class="text-[10px] font-medium text-slate-600 dark:text-slate-400 text-center line-clamp-1 w-full">{{ fav.name }}</span>
+              </div>
+            }
+             <div (click)="navigate('explore')" class="flex flex-col items-center gap-1.5 cursor-pointer opacity-60">
+               <div class="w-14 h-14 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-400">
+                 <i class="fa fa-plus text-sm"></i>
+               </div>
+               <span class="text-[10px] font-medium text-slate-500">Mais</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Compact Categories -->
+        <section>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pl-1">Categorias</h3>
+          <div class="grid grid-cols-2 gap-3">
+             @for (cat of categories; track cat.id) {
+               <div (click)="navigate('category', cat.id)" class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer active:scale-95 transition-transform">
+                 <div [class]="'w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm shadow-sm ' + cat.color">
+                   <i [class]="'fa ' + cat.icon"></i>
+                 </div>
+                 <span class="font-semibold text-slate-700 dark:text-slate-200 text-xs">{{ tService.t(cat.id) }}</span>
+               </div>
+             }
+          </div>
+        </section>
+
+      </div>
+    }
+
+    <!-- VIEW: EXPLORE (Revised) -->
+    @if (currentView() === 'explore') {
+      <div class="fade-in flex flex-col h-full">
+        <!-- Sticky Search Header -->
+        <div class="sticky top-0 z-20 bg-[#FAFAFA] dark:bg-[#0B0F19] pt-2 pb-4">
+           <input 
+             type="text" 
+             [(ngModel)]="searchQuery" 
+             (input)="onSearch()"
+             [placeholder]="tService.t('search_placeholder')"
+             class="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-sm border border-slate-100 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium"
+             autofocus
+           />
+           
+           <!-- Filter Pills -->
+           <div class="flex overflow-x-auto gap-2 mt-4 pb-2 no-scrollbar">
+              <button 
+                (click)="filterExplore('all')"
+                [class]="'whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ' + (activeCategory() === 'all' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700')">
+                Todos
+              </button>
+              @for (cat of categories; track cat.id) {
+                <button 
+                  (click)="filterExplore(cat.id)"
+                  [class]="'whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ' + (activeCategory() === cat.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700')">
+                  {{ tService.t(cat.id) }}
+                </button>
+              }
+           </div>
+        </div>
+
+        <!-- Tool Grid (Better than list) -->
+        <div class="grid grid-cols-2 gap-3 pb-20">
+          @if (currentTools().length === 0) {
+             <div class="col-span-2 text-center py-10 opacity-50">
+               <i class="fa fa-search text-2xl text-slate-300 mb-2"></i>
+               <p class="text-xs font-medium text-slate-400">Nada encontrado</p>
+             </div>
+          }
+          @for (tool of currentTools(); track tool.id) {
+            <div (click)="openTool(tool)" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-3 cursor-pointer active:scale-95 transition-transform hover:shadow-md">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-slate-700/50 flex items-center justify-center text-indigo-500 dark:text-indigo-400">
+                  <i [class]="'fa ' + tool.icon + ' text-sm'"></i>
+                </div>
+                <i class="fa fa-arrow-right -rotate-45 text-slate-200 dark:text-slate-700 text-xs"></i>
+              </div>
+              <div>
+                 <span class="font-bold text-slate-700 dark:text-slate-200 text-sm line-clamp-1">{{ tool.name }}</span>
+                 <span class="text-[10px] text-slate-400 line-clamp-1 mt-0.5">{{ tool.description }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- VIEW: CATEGORY (Detail) -->
+    @if (currentView() === 'category') {
+      <div class="fade-in">
+        <div class="flex items-center gap-3 mb-6">
+          <button (click)="navigate('home')" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500">
+            <i class="fa fa-arrow-left text-xs"></i>
+          </button>
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">{{ categoryTitle() }}</h2>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2">
+          @for (tool of currentTools(); track tool.id) {
+            <div (click)="openTool(tool)" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4 cursor-pointer active:scale-[0.99]">
+               <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-500">
+                  <i [class]="'fa ' + tool.icon"></i>
+               </div>
+               <div class="flex-1">
+                 <span class="text-slate-700 dark:text-slate-200 font-bold text-sm block">{{ tool.name }}</span>
+                 <span class="text-[10px] text-slate-400">{{ tool.description }}</span>
+               </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- VIEW: TOOL -->
+    @if (currentView() === 'tool' && activeTool()) {
+      <div class="fixed inset-0 z-[60] bg-[#FAFAFA] dark:bg-[#0B0F19] flex flex-col fade-in">
+         <!-- Tool Header -->
+         <div class="px-4 py-3 flex items-center justify-between bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-100 dark:border-slate-800">
+           <button (click)="navigate('home')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+             <i class="fa fa-chevron-down text-xs"></i>
+           </button>
+           <span class="font-bold text-slate-800 dark:text-white text-sm">{{ activeTool()!.name }}</span>
+           <button (click)="toggleFavorite(activeTool()!)" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+             <i [class]="isFavorite(activeTool()!) ? 'fa fa-heart text-red-500 text-xs' : 'fa fa-heart-o text-slate-400 text-xs'"></i>
+           </button>
+         </div>
+         
+         <!-- Content -->
+         <div class="flex-1 overflow-y-auto">
+            <app-tool-runner [tool]="activeTool()!" class="block h-full"></app-tool-runner>
+         </div>
+      </div>
+    }
+
+    <!-- VIEW: CHAT -->
+    @if (currentView() === 'chat') {
+      <div class="fade-in flex flex-col h-[calc(100vh-140px)]">
+         <div class="flex-1 overflow-y-auto space-y-3 p-4 scroll-smooth">
+            @for (msg of chatMessages(); track $index) {
+              <div [class]="'flex ' + (msg.role === 'user' ? 'justify-end' : 'justify-start')">
+                 <div [class]="'max-w-[85%] px-4 py-3 rounded-2xl text-sm shadow-sm ' + (msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-bl-sm border border-slate-100 dark:border-slate-800')">
+                    {{ msg.text }}
+                 </div>
+              </div>
+            }
+            @if (isChatLoading()) {
+              <div class="flex justify-start">
+                 <div class="bg-white dark:bg-slate-800 px-3 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex gap-1">
+                      <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                      <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-75"></div>
+                      <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce delay-150"></div>
+                    </div>
+                 </div>
+              </div>
+            }
+         </div>
+         <div class="px-4 pb-2">
+            <div class="bg-white dark:bg-slate-800 p-2 pl-4 rounded-full shadow-lg border border-slate-100 dark:border-slate-800 flex items-center gap-2">
+              <input 
+                type="text" 
+                [(ngModel)]="chatInput"
+                (keyup.enter)="sendChatMessage()" 
+                [disabled]="isChatLoading()"
+                [placeholder]="tService.t('typing')"
+                class="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder-slate-400 text-xs py-2"
+              />
+              <button (click)="sendChatMessage()" [disabled]="isChatLoading() || !chatInput.trim()" class="w-8 h-8 bg-indigo-600 rounded-full text-white flex items-center justify-center hover:bg-indigo-700 disabled:opacity-50">
+                <i class="fa fa-arrow-up text-[10px]"></i>
+              </button>
+            </div>
+         </div>
+      </div>
+    }
+
+    <!-- VIEW: PROFILE -->
+    @if (currentView() === 'profile') {
+      <div class="fade-in space-y-4 pt-4">
+         <div class="flex items-center gap-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
+            <img [src]="currentUser()?.avatar" class="w-16 h-16 rounded-full object-cover">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800 dark:text-white">{{ currentUser()?.name }}</h2>
+              <p class="text-xs text-slate-500">{{ currentUser()?.email }}</p>
+            </div>
+         </div>
+
+         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden text-sm">
+            <div class="p-4 flex justify-between items-center border-b border-slate-50 dark:border-slate-700/50">
+               <span class="font-medium text-slate-700 dark:text-slate-200">{{ tService.t('language') }}</span>
+               <select (change)="changeLang($event)" class="bg-slate-100 dark:bg-slate-900 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white">
+                 <option value="pt" [selected]="tService.currentLang() === 'pt'">PT</option>
+                 <option value="en" [selected]="tService.currentLang() === 'en'">EN</option>
+                 <option value="es" [selected]="tService.currentLang() === 'es'">ES</option>
+               </select>
+            </div>
+            <div (click)="performLogout()" class="p-4 flex justify-between items-center text-red-500 font-medium cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/10 transition">
+               <span>Sair da Conta</span>
+               <i class="fa fa-sign-out"></i>
+            </div>
+         </div>
+      </div>
+    }
+
+  </main>
+
+  <!-- Navigation Dock (Improved) -->
+  <div class="fixed bottom-6 left-0 right-0 z-40 flex justify-center pointer-events-none">
+    
+    <!-- Dock Container -->
+    <nav class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-full shadow-2xl border border-slate-100 dark:border-slate-800 px-6 h-16 flex items-center justify-between gap-8 pointer-events-auto relative">
+      
+      <!-- Left Icons -->
+      <button (click)="navigate('home')" [class]="'flex flex-col items-center justify-center w-10 transition-colors ' + (currentView() === 'home' ? 'text-indigo-600 dark:text-white' : 'text-slate-400')">
+        <i class="fa fa-home text-xl mb-0.5"></i>
+      </button>
+      
+      <button (click)="navigate('explore')" [class]="'flex flex-col items-center justify-center w-10 transition-colors ' + (currentView() === 'explore' || currentView() === 'category' ? 'text-indigo-600 dark:text-white' : 'text-slate-400')">
+        <i class="fa fa-th-large text-xl mb-0.5"></i>
+      </button>
+
+      <!-- Spacer for Center Button -->
+      <div class="w-10"></div>
+
+      <!-- Center AI Button (Floating) -->
+      <div class="absolute left-1/2 -translate-x-1/2 -top-6">
+         <button (click)="navigate('chat')" class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full text-white shadow-xl shadow-indigo-500/40 flex items-center justify-center border-[5px] border-[#FAFAFA] dark:border-[#0B0F19] active:scale-95 transition-transform">
+           <i class="fa fa-sparkles text-xl"></i>
+         </button>
+      </div>
+
+      <!-- Right Icons -->
+      <button (click)="navigate('favorites')" [class]="'flex flex-col items-center justify-center w-10 transition-colors ' + (currentView() === 'favorites' ? 'text-indigo-600 dark:text-white' : 'text-slate-400')">
+        <i class="fa fa-heart text-xl mb-0.5"></i>
+      </button>
+
+      <button (click)="navigate('profile')" [class]="'flex flex-col items-center justify-center w-10 transition-colors ' + (currentView() === 'profile' ? 'text-indigo-600 dark:text-white' : 'text-slate-400')">
+        <i class="fa fa-user text-xl mb-0.5"></i>
+      </button>
+      
+    </nav>
+  </div>
+</div>
+}

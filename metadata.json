@@ -1,0 +1,8 @@
+{
+  "name": "Aura AI",
+  "description": "Seu assistente pessoal inteligente com mais de 1000 funcionalidades.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
